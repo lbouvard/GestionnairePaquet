@@ -9,6 +9,9 @@ namespace GestionnairePaquet.Models
     // Vous pouvez ajouter des données de profil pour l'utilisateur en ajoutant plus de propriétés à votre classe ApplicationUser ; consultez http://go.microsoft.com/fwlink/?LinkID=317594 pour en savoir davantage.
     public class ApplicationUser : IdentityUser
     {
+
+        public virtual Societe Membre { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Notez qu'authenticationType doit correspondre à l'élément défini dans CookieAuthenticationOptions.AuthenticationType
@@ -24,6 +27,14 @@ namespace GestionnairePaquet.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
+
+        public DbSet<Societe> Societes { get; set; }
+
+        public DbSet<Produit> Produits { get; set; }
+
+        public DbSet<Version> Versions { get; set; }
+
+        public DbSet<Fichier> Fichiers { get; set; }
 
         public static ApplicationDbContext Create()
         {
