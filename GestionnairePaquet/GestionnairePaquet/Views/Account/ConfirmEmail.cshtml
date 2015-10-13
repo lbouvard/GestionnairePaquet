@@ -1,10 +1,15 @@
 ﻿@{
-    ViewBag.Title = "Confirmation de l'e-mail";
+    ViewBag.Title = "Votre compte est à présent validé.";
 }
 
 <h2>@ViewBag.Title.</h2>
 <div>
     <p>
-        Merci d'avoir confirmé votre e-mail. Veuillez @Html.ActionLink("Cliquer ici pour vous connecter", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+        Nous vous remercions de votre confiance. 
+     <</p>
+
+    <p>
+        Vous pouvez à présent vous @Html.ActionLink("connecter", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" }) à notre interface de gestion de vos applications mobiles.
+        
     </p>
 </div>

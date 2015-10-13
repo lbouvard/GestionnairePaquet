@@ -11,15 +11,49 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using GestionnairePaquet.Models;
+using SendGrid;
+using System.Net;
+using System.Configuration;
+using System.Diagnostics;
 
 namespace GestionnairePaquet
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
             // Indiquez votre service de messagerie ici pour envoyer un e-mail.
-            return Task.FromResult(0);
+            await configSendGridasync(message);
+        }
+
+        private async Task configSendGridasync(IdentityMessage message)
+        {
+            var email = new SendGridMessage();
+            email.AddTo(message.Destination);
+            email.From = new System.Net.Mail.MailAddress(
+                                "support@flamingsoft.com", "Service support");
+            email.Subject = message.Subject;
+            email.Text = message.Body;
+            email.Html = message.Body;
+
+            var credentials = new NetworkCredential(
+                       ConfigurationManager.AppSettings["CompteServiceMail"],
+                       ConfigurationManager.AppSettings["MotDePasseServiceMail"]
+                       );
+
+            // Create a Web transport for sending email.
+            var transportWeb = new Web(credentials);
+
+            // Send the email.
+            if (transportWeb != null)
+            {
+                await transportWeb.DeliverAsync(email);
+            }
+            else
+            {
+                Trace.TraceError("Failed to create Web transport.");
+                await Task.FromResult(0);
+            }
         }
     }
 

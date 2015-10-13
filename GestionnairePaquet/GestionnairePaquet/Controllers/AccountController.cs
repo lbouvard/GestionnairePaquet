@@ -73,6 +73,19 @@ namespace GestionnairePaquet.Controllers
                 return View(model);
             }
 
+            // L'utilisateur doit avoir confirmé le mail
+            var utilisateur = await UserManager.FindByNameAsync(model.Email);
+            if (utilisateur != null)
+            {
+                if (!await UserManager.IsEmailConfirmedAsync(utilisateur.Id))
+                {
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(utilisateur.Id, "Confirmez vote demande de renvoi du courriel de confirmation");
+
+                    ViewBag.errorMessage = "Vous devez valider le mail de confirmation avant de pouvoir vous connecter.";
+                    return View("Error");
+                }
+            }
+
             // Ceci ne comptabilise pas les échecs de connexion pour le verrouillage du compte
             // Pour que les échecs de mot de passe déclenchent le verrouillage du compte, utilisez shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
@@ -155,15 +168,17 @@ namespace GestionnairePaquet.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+
                     // Pour plus d'informations sur l'activation de la confirmation du compte et la réinitialisation du mot de passe, consultez http://go.microsoft.com/fwlink/?LinkID=320771
                     // Envoyer un message électronique avec ce lien
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirmez votre compte", "Confirmez votre compte en cliquant <a href=\"" + callbackUrl + "\">ici</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirmez votre compte client");
+
+                    ViewBag.Message = "Veuillez vérifier votre boîte à lettre et confirmer votre compte. Vous devez avoir un compte validé avant de pouvoir vous connecter.";
+
+                    return View("Info");
+                    //return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
             }
@@ -211,10 +226,10 @@ namespace GestionnairePaquet.Controllers
 
                 // Pour plus d'informations sur l'activation de la confirmation du compte et la réinitialisation du mot de passe, consultez http://go.microsoft.com/fwlink/?LinkID=320771
                 // Envoyer un message électronique avec ce lien
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Réinitialiser le mot de passe", "Réinitialisez votre mot de passe en cliquant <a href=\"" + callbackUrl + "\">ici</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                await UserManager.SendEmailAsync(user.Id, "Réinitialiser le mot de passe", "Pour réinitialiser votre mot de passe cliquez <a href=\"" + callbackUrl + "\">ici</a>");
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // Si nous sommes arrivés là, un échec s’est produit. Réafficher le formulaire
@@ -421,6 +436,17 @@ namespace GestionnairePaquet.Controllers
             }
 
             base.Dispose(disposing);
+        }
+
+        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject)
+        {
+            string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account",
+               new { userId = userID, code = code }, protocol: Request.Url.Scheme);
+            await UserManager.SendEmailAsync(userID, subject,
+               "Confirmez votre compte en cliquant <a href=\"" + callbackUrl + "\">ici</a>");
+
+            return callbackUrl;
         }
 
         #region Applications auxiliaires

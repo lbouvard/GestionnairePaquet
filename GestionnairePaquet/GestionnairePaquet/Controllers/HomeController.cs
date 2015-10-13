@@ -15,15 +15,36 @@ namespace GestionnairePaquet.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "A propos de nous...";
 
             return View();
         }
 
+        [Authorize]
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Pour nous contacter...";
 
+            return View();
+        }
+
+        public ActionResult Admin()
+        {
+            return View();
+        }
+
+        public ActionResult Paquets()
+        {
+            return View();
+        }
+
+        public ActionResult Produits()
+        {
+            return View();
+        }
+
+        public ActionResult Alpha()
+        {
             return View();
         }
     }
