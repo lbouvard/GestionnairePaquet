@@ -1,0 +1,48 @@
+﻿@model IEnumerable<GestionnairePaquet.Models.ApplicationUser>
+
+@{
+    ViewBag.Title = "Gestion des comptes";
+}
+
+<h2>Gestion des comptes</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EmailConfirmed)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailConfirmed)
+            </td>
+            <td>
+                @Html.ActionLink("Réinitialiser", "ReinitMdp", new { id = item.Id }) |
+                @Html.ActionLink("Renvoyer confirmation", "Confirmer", new { id = item.Id }) |
+                @Html.ActionLink("Supprimer", "DeleteCompte", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+<div>
+    @Html.ActionLink("Revenir à la liste des clients", "Index")
+</div>
+

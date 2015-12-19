@@ -1,8 +1,9 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace GestionnairePaquet.Models
 {
@@ -28,17 +29,20 @@ namespace GestionnairePaquet.Models
         {
         }
 
-        public DbSet<Societe> Societes { get; set; }
-
-        public DbSet<Produit> Produits { get; set; }
-
-        public DbSet<Version> Versions { get; set; }
-
-        public DbSet<Fichier> Fichiers { get; set; }
-
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
+        }
+
+        public DbSet<Fichier> Fichiers { get; set; }
+        public DbSet<Societe> Societes { get; set; }
+        public DbSet<Produit> Produits { get; set; }
+        public DbSet<Version> Versions { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
         }
     }
 }

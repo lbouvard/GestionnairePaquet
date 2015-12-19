@@ -1,6 +1,8 @@
-﻿using GestionnairePaquet.Models;
+﻿using GestionnairePaquet.Migrations;
+using GestionnairePaquet.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,7 +13,7 @@ namespace GestionnairePaquet.Controllers
     {
         public ActionResult Index()
         {
-            using (var context = new ApplicationDbContext())
+            /*using (var context = new ApplicationDbContext())
             {
                 var test = context.Produits.FirstOrDefault();
 
@@ -27,44 +29,17 @@ namespace GestionnairePaquet.Controllers
                 context.Produits.Add(produit1);
                 //applique les changements
                 context.SaveChanges();
-            }
+            }*/
 
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult APropos()
         {
             ViewBag.Message = "A propos de nous...";
 
             return View();
         }
 
-        [Authorize]
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Pour nous contacter...";
-
-            return View();
-        }
-
-        public ActionResult Admin()
-        {
-            return View();
-        }
-
-        public ActionResult Paquets()
-        {
-            return View();
-        }
-
-        public ActionResult Produits()
-        {
-            return View();
-        }
-
-        public ActionResult Alpha()
-        {
-            return View();
-        }
     }
 }

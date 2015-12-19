@@ -1,0 +1,38 @@
+﻿@model GestionnairePaquet.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "Réinitialiser le mot de passe";
+}
+
+<h2>Réinitialisation</h2>
+
+<h3>Est vous sûr de vouloir réinitialiser le mot de passe de ce compte ?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Réinitialiser" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

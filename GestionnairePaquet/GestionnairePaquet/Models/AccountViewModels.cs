@@ -49,9 +49,8 @@ namespace GestionnairePaquet.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Courrier électronique")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "Nom d'utilisateur")]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -64,6 +63,11 @@ namespace GestionnairePaquet.Models
 
     public class RegisterViewModel
     {
+        [Required]
+        [StringLength(25, ErrorMessage = "La chaîne {0} doit comporter entre 5 et 25 caractères.", MinimumLength = 5 )]
+        [Display(Name = "Nom d'utilisateur")]
+        public string UserName { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Courrier électronique")]

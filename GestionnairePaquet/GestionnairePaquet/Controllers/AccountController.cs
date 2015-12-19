@@ -18,16 +18,27 @@ namespace GestionnairePaquet.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
+        /// <summary>
+        /// Constructeur par défaut
+        /// </summary>
         public AccountController()
         {
         }
 
+        /// <summary>
+        /// Constructeur avec paramètres
+        /// </summary>
+        /// <param name="userManager">Gestionnaire utilisateur</param>
+        /// <param name="signInManager">Gestionnaire de connexion</param>
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
+        /// <summary>
+        /// Récupération d'une instance du gestionnaire de connexion
+        /// </summary>
         public ApplicationSignInManager SignInManager
         {
             get
@@ -40,6 +51,9 @@ namespace GestionnairePaquet.Controllers
             }
         }
 
+        /// <summary>
+        /// Récupération du gestionnaire utilisateur
+        /// </summary>
         public ApplicationUserManager UserManager
         {
             get
@@ -74,7 +88,7 @@ namespace GestionnairePaquet.Controllers
             }
 
             // L'utilisateur doit avoir confirmé le mail
-            var utilisateur = await UserManager.FindByNameAsync(model.Email);
+            var utilisateur = await UserManager.FindByNameAsync(model.UserName);
             if (utilisateur != null)
             {
                 if (!await UserManager.IsEmailConfirmedAsync(utilisateur.Id))
@@ -88,7 +102,7 @@ namespace GestionnairePaquet.Controllers
 
             // Ceci ne comptabilise pas les échecs de connexion pour le verrouillage du compte
             // Pour que les échecs de mot de passe déclenchent le verrouillage du compte, utilisez shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: true);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -96,7 +110,7 @@ namespace GestionnairePaquet.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    //return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Tentative de connexion non valide.");
@@ -164,21 +178,22 @@ namespace GestionnairePaquet.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    //connexion automatique
                     //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
 
-                    // Pour plus d'informations sur l'activation de la confirmation du compte et la réinitialisation du mot de passe, consultez http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Envoyer un message électronique avec ce lien
+                    //ajout le rôle d'utilisateur
+                    UserManager.AddToRole(user.Id, "User");
 
+                    // Envoyer un message électronique avec ce lien
                     string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirmez votre compte client");
 
                     ViewBag.Message = "Veuillez vérifier votre boîte à lettre et confirmer votre compte. Vous devez avoir un compte validé avant de pouvoir vous connecter.";
 
                     return View("Info");
-                    //return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
             }

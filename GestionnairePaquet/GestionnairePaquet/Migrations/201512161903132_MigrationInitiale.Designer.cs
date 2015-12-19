@@ -7,13 +7,13 @@ namespace GestionnairePaquet.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Membre : IMigrationMetadata
+    public sealed partial class MigrationInitiale : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Membre));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(MigrationInitiale));
         
         string IMigrationMetadata.Id
         {
-            get { return "201510131309194_Membre"; }
+            get { return "201512161903132_MigrationInitiale"; }
         }
         
         string IMigrationMetadata.Source
