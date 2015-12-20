@@ -33,9 +33,7 @@
                 @Html.DisplayFor(modelItem => item.EmailConfirmed)
             </td>
             <td>
-                @Html.ActionLink("Réinitialiser", "ReinitMdp", new { id = item.Id }) |
-                @Html.ActionLink("Renvoyer confirmation", "Confirmer", new { id = item.Id }) |
-                @Html.ActionLink("Supprimer", "DeleteCompte", new { id = item.Id })
+                @Html.ActionLink("Supprimer", "CompteDelete", new { id = item.Id })
             </td>
         </tr>
     }

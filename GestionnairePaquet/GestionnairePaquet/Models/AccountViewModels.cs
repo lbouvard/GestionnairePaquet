@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace GestionnairePaquet.Models
 {
@@ -64,6 +65,12 @@ namespace GestionnairePaquet.Models
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name = "Société")]
+        public int SocieteId { get; set; }
+
+        public IEnumerable<Societe> SocieteListe { get; set; }
+
+        [Required]
         [StringLength(25, ErrorMessage = "La chaîne {0} doit comporter entre 5 et 25 caractères.", MinimumLength = 5 )]
         [Display(Name = "Nom d'utilisateur")]
         public string UserName { get; set; }
@@ -81,7 +88,7 @@ namespace GestionnairePaquet.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirmer le mot de passe ")]
-        [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
         public string ConfirmPassword { get; set; }
     }
 
@@ -100,7 +107,7 @@ namespace GestionnairePaquet.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirmer le mot de passe")]
-        [Compare("Password", ErrorMessage = "Le nouveau mot de passe et le mot de passe de confirmation ne correspondent pas.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "Le nouveau mot de passe et le mot de passe de confirmation ne correspondent pas.")]
         public string ConfirmPassword { get; set; }
 
         public string Code { get; set; }

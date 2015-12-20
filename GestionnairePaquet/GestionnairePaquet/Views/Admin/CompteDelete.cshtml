@@ -1,12 +1,12 @@
 ﻿@model GestionnairePaquet.Models.ApplicationUser
 
 @{
-    ViewBag.Title = "Réinitialiser le mot de passe";
+    ViewBag.Title = "Suppression compte";
 }
 
-<h2>Réinitialisation</h2>
+<h2>Suppression d'un compte</h2>
 
-<h3>Est vous sûr de vouloir réinitialiser le mot de passe de ce compte ?</h3>
+<h3>Etes-vous sur de vouloir supprimer ce compte ?</h3>
 <div>
     <hr />
     <dl class="dl-horizontal">
@@ -31,8 +31,12 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Réinitialiser" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+            <input type="submit" value="Supprimer" class="btn btn-default" /> |
+            @Html.ActionLink(
+            "Retour",
+            "Comptes",
+            new { Id = Model.SocieteId }
+            )
         </div>
     }
 </div>

@@ -13,7 +13,7 @@ using GestionnairePaquet.Models;
 namespace GestionnairePaquet.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -166,7 +166,14 @@ namespace GestionnairePaquet.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            RegisterViewModel viewModel = new RegisterViewModel();
+
+            using (var db = new ApplicationDbContext())
+            {
+                viewModel.SocieteListe = db.Societes.ToList();
+            }
+
+            return View(viewModel);
         }
 
         //
@@ -178,7 +185,7 @@ namespace GestionnairePaquet.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, SocieteId = model.SocieteId };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -196,6 +203,11 @@ namespace GestionnairePaquet.Controllers
                     return View("Info");
                 }
                 AddErrors(result);
+                //on peuple la liste car on va refaire un passage dans la vue
+                using (var db = new ApplicationDbContext())
+                {
+                    model.SocieteListe = db.Societes.ToList();
+                }
             }
 
             // Si nous sommes arrivés là, un échec s’est produit. Réafficher le formulaire
@@ -232,7 +244,7 @@ namespace GestionnairePaquet.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Ne révélez pas que l'utilisateur n'existe pas ou qu'il n'est pas confirmé

@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace GestionnairePaquet.Controllers
 {
-    public class TelechargementController : Controller
+    public class TelechargementController : BaseController
     {
         // GET: Telechargement
         public ActionResult Index()

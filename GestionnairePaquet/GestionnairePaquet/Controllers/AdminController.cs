@@ -7,10 +7,11 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using GestionnairePaquet.Models;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace GestionnairePaquet.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
@@ -52,6 +53,8 @@ namespace GestionnairePaquet.Controllers
             {
                 db.Societes.Add(societe);
                 db.SaveChanges();
+
+                Success(String.Format("La société {0} a été créée avec succès.", societe.Nom), true);
                 return RedirectToAction("Index");
             }
 
@@ -84,6 +87,9 @@ namespace GestionnairePaquet.Controllers
             {
                 db.Entry(societe).State = EntityState.Modified;
                 db.SaveChanges();
+
+                Success(string.Format("La société {0} a été modifiée avec succès.", societe.Nom), true);
+
                 return RedirectToAction("Index");
             }
             return View(societe);
@@ -112,6 +118,9 @@ namespace GestionnairePaquet.Controllers
             Societe societe = db.Societes.Find(id);
             db.Societes.Remove(societe);
             db.SaveChanges();
+
+            Success(string.Format("La société {0} a été supprimée de la base.", societe.Nom), true);
+
             return RedirectToAction("Index");
         }
 
@@ -123,7 +132,7 @@ namespace GestionnairePaquet.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var utilisateurs = db.Users.Where(u => u.Membre.ID == id).ToList();
+            var utilisateurs = db.Users.Where(u => u.SocieteId == id).ToList();
             if (utilisateurs == null)
             {
                 return HttpNotFound();
@@ -131,20 +140,36 @@ namespace GestionnairePaquet.Controllers
             return View(utilisateurs);
         }
 
-        //GET: Admin/ReinitMdp/5
-        public ActionResult ReinitMdp(int? id)
+        // GET: Admin/CompteDelete/5
+        public ActionResult CompteDelete(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            
+
             var utilisateur = db.Users.Find(id);
             if (utilisateur == null)
             {
                 return HttpNotFound();
             }
             return View(utilisateur);
+        }
+
+        // POST: Admin/CompteDelete/5
+        [HttpPost, ActionName("CompteDelete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompteDeleteConfirmed(string id)
+        {
+            var utilisateur = db.Users.Find(id);
+            var nom = utilisateur.UserName;
+
+            db.Users.Remove(utilisateur);
+            db.SaveChanges();
+
+            Success(string.Format("Le compte {0} a été supprimée de la base.", nom), true);
+
+            return RedirectToAction("Comptes", new { Id = utilisateur.SocieteId });
         }
 
         protected override void Dispose(bool disposing)

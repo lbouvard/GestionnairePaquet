@@ -14,9 +14,14 @@ namespace GestionnairePaquet.Models
         //Champs
         [Key]
         public int ID { get; set; } 
+        [Required]
         public string Nom { get; set; }
+        [Required]
         public string Adresse { get; set; }
+        [Required]
+        [StringLength(5, ErrorMessage ="Veuillez entrer le code postal sur cinq caractères.", MinimumLength = 5)]
         public string CodePostal { get; set; }
+        [Required]
         public string Ville { get; set; }
            
         //Navigation double sens
