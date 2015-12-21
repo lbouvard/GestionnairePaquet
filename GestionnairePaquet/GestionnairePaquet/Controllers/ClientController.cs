@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GestionnairePaquet.Models;
+using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,12 +8,53 @@ using System.Web.Mvc;
 
 namespace GestionnairePaquet.Controllers
 {
-    public class TelechargementController : BaseController
+    public class ClientController : BaseController
     {
+        /// <summary>
+        /// Permet de choisir le produit disponible pour la société cliente
+        /// </summary>
+        /// <returns></returns>
         // GET: Telechargement
         public ActionResult Index()
         {
-            return View();
+            List<Produit> liste = null;
+            string UserId = User.Identity.GetUserId();
+            int SocieteId = 0;
+
+            using (var db = new ApplicationDbContext())
+            {
+
+                SocieteId = db.Users.Find(UserId).SocieteId;
+
+                var query = from p in db.Produits
+                            where p.SocieteID == SocieteId
+                            select p;
+
+                liste = query.ToList();
+            }
+
+            return View(liste);
+        }
+
+        /// <summary>
+        /// Permet de récupérer les données des différentes versions
+        /// </summary>
+        /// <returns></returns>
+        // GET: Verzsion/1
+        public ActionResult Version(int Id)
+        {
+            List<Models.Version> liste = null;
+
+            using (var db = new ApplicationDbContext())
+            {
+                var query = from v in db.Versions.Include("Produit")
+                            where v.ProduitID == Id
+                            select v;
+
+                liste = query.ToList();
+            }
+
+            return View(liste);
         }
 
         // GET: Telechargement/Details/5

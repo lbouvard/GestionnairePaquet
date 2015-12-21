@@ -23,7 +23,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Accueil", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Mon compte", "Gerer", "Client")</li>
+                    <li>@Html.ActionLink("Mon compte", "Index", "Manage")</li>
                     <li>@Html.ActionLink("Telechargement", "Index", "Client")</li>
                     @if (User.IsInRole("Admin"))
                     {

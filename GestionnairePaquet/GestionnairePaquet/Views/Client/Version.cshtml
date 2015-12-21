@@ -1,0 +1,30 @@
+﻿@model IEnumerable<GestionnairePaquet.Models.Version>
+
+@{
+    ViewBag.Title = "Choississez la version";
+}
+<h2>Liste des versions</h2>
+@if (Model.Count() > 0)
+{
+    <div class="panel-group" id="accordion">
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            var item = Model.ElementAt(i);
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="@string.Concat("#collapse", @item.ID)">
+                            @string.Concat(item.Produit.Nom, " v", item.Numero)
+                        </a>
+                    </h4>
+                </div>
+                <div id="@string.Concat("collapse", @item.ID)" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        test
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
