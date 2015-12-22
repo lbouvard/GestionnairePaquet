@@ -7,7 +7,6 @@
     <title>@ViewBag.Title - Gestionnaire de fichier</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -51,6 +50,23 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('[id*="LienAjax_"]').click(function () {
+
+            $('[class*="panel-collapse in"]').collapse('hide');
+            
+            //on récupère l'id du lien cliqué
+            var str = $(this)[0].id;
+            str = str.substring(str.indexOf("_") + 1);
+            //nom de la balise a afficher ou cacher
+            var element = "#collapse" + str;
+
+            $(element).collapse('show');
+        });
+    });
+    </script>
     
 </body>
 </html>

@@ -52,7 +52,7 @@ namespace GestionnairePaquet.Migrations
                     SocieteID = societes.Single(s => s.Nom == "PlastProd").ID,
                     Description = "Application de gestion commercial de la société PlastProd",
                     Actif = true,
-                    Icone = "ic_plastprodapp",
+                    Icone = "ic_plastprodapp.png",
                 },
                 new Produit
                 {
@@ -60,7 +60,7 @@ namespace GestionnairePaquet.Migrations
                     SocieteID = societes.Single(s => s.Nom == "Arc").ID,
                     Description = "Application de démonstration",
                     Actif = true,
-                    Icone = "ic_imotepapp",
+                    Icone = "ic_imotepapp.png",
                 }
             };
             produits.ForEach(p => context.Produits.AddOrUpdate( u => new { u.Nom, u.SocieteID } , p));
@@ -76,10 +76,10 @@ namespace GestionnairePaquet.Migrations
 
             var fichiers = new List<Fichier>
             {
-                new Fichier{ Nom = "PlastProdAppv1", Extension = "apk", Taille = 34500000, DateVersion = DateTimeOffset.Parse("2015-09-15 14:25:20"), VersionID = versions.Single(v => v.Numero == "1.0").ID },
-                new Fichier{ Nom = "ChangeLogv1", Extension = "pdf", Taille = 230000, DateVersion = DateTimeOffset.Parse("2015-09-15 14:27:10"), VersionID = versions.Single(v => v.Numero == "1.0").ID  },
-                new Fichier{ Nom = "PlastProdAppv2", Extension = "apk", Taille = 31500000, DateVersion = DateTimeOffset.Parse("2015-12-15 08:17:20"), VersionID = versions.Single(v => v.Numero == "2.0").ID  },
-                new Fichier{ Nom = "ChangeLogv2", Extension = "pdf", Taille = 230000, DateVersion = DateTimeOffset.Parse("2015-12-15 08:20:14"), VersionID = versions.Single(v => v.Numero == "2.0").ID  }
+                new Fichier{ Nom = "PlastProdAppv1", Extension = "apk", Taille = 34500000, DateVersion = DateTimeOffset.Parse("2015-09-15 14:25:20"), VersionID = versions.Single(v => v.Numero == "1.0").ID, Icone = "ic_apk.png" },
+                new Fichier{ Nom = "ChangeLogv1", Extension = "pdf", Taille = 230000, DateVersion = DateTimeOffset.Parse("2015-09-15 14:27:10"), VersionID = versions.Single(v => v.Numero == "1.0").ID, Icone = "ic_pdf.png"  },
+                new Fichier{ Nom = "PlastProdAppv2", Extension = "apk", Taille = 31500000, DateVersion = DateTimeOffset.Parse("2015-12-15 08:17:20"), VersionID = versions.Single(v => v.Numero == "2.0").ID, Icone = "ic_apk.png"  },
+                new Fichier{ Nom = "ChangeLogv2", Extension = "pdf", Taille = 230000, DateVersion = DateTimeOffset.Parse("2015-12-15 08:20:14"), VersionID = versions.Single(v => v.Numero == "2.0").ID, Icone = "ic_pdf.png"  }
             };
             fichiers.ForEach(f => context.Fichiers.AddOrUpdate(u => new { u.Nom, u.VersionID }, f));
             context.SaveChanges();

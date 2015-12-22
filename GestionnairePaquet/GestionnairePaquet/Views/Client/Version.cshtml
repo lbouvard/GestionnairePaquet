@@ -14,17 +14,23 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="@string.Concat("#collapse", @item.ID)">
-                            @string.Concat(item.Produit.Nom, " v", item.Numero)
-                        </a>
+                        <!--<a data-toggle="collapse" data-parent="#accordion" aria-expanded="false">-->
+                            @Ajax.ActionLink(string.Concat(item.Produit.Nom, " v", item.Numero), "AfficheFichiers", new { id = item.ID }, new AjaxOptions
+                            {
+                               InsertionMode = InsertionMode.Replace,
+                               UpdateTargetId = string.Concat("contenu", item.ID),
+                               HttpMethod = "GET"
+                            }, new { id = "LienAjax_" + item.ID })
+                        <!--</a>-->
                     </h4>
                 </div>
-                <div id="@string.Concat("collapse", @item.ID)" class="panel-collapse collapse in">
-                    <div class="panel-body">
-                        test
+                <div id="@string.Concat("collapse", @item.ID)" class="panel-collapse collapse">
+                    <div id="@string.Concat("contenu", @item.ID)" class="panel-body">
                     </div>
                 </div>
             </div>
+
+
         }
     </div>
 }

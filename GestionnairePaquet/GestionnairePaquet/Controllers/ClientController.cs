@@ -40,21 +40,58 @@ namespace GestionnairePaquet.Controllers
         /// Permet de récupérer les données des différentes versions
         /// </summary>
         /// <returns></returns>
-        // GET: Verzsion/1
-        public ActionResult Version(int Id)
+        // GET: Version/1
+        public ActionResult Version(int id)
         {
             List<Models.Version> liste = null;
 
             using (var db = new ApplicationDbContext())
             {
                 var query = from v in db.Versions.Include("Produit")
-                            where v.ProduitID == Id
+                            where v.ProduitID == id
                             select v;
 
                 liste = query.ToList();
             }
 
             return View(liste);
+        }
+
+        /// <summary>
+        /// Permet d'afficher les documents d'une version
+        /// </summary>
+        /// <returns></returns>
+        // GET: AfficheFichiers/1
+        public ActionResult AfficheFichiers(int id)
+        {
+            List<Fichier> liste = null;
+
+            using (var db = new ApplicationDbContext())
+            {
+                ViewBag.ChangeLog = (from v in db.Versions
+                                     where v.ID == id
+                                     select v.ChangeLog).First();
+
+                var query = from f in db.Fichiers.Include("Version")
+                            where f.VersionID == id
+                            select f;
+
+                liste = query.ToList();
+            }
+
+            return PartialView(liste);
+        }
+
+        /// <summary>
+        /// Permet de télécharger un fichier
+        /// </summary>
+        /// <returns></returns>
+        // GET: AfficheFichiers/1
+        public ActionResult TelechargeFichier(string fichier)
+        {
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/Fichiers/";
+            return File(path + fichier, "text/plain", fichier);
+            //return File("~/Content/Fichiers/" + fichier, System.Net.Mime.MediaTypeNames.Application.Octet);
         }
 
         // GET: Telechargement/Details/5

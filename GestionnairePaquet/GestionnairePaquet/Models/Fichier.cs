@@ -16,6 +16,7 @@ namespace GestionnairePaquet.Models
         public int ID { get; set; }
         public string Nom { get; set; }
         public string Extension { get; set; }
+        public string Icone { get; set; }
         public DateTimeOffset DateVersion { get; set; }
         public int Taille { get; set; }
         public int VersionID { get; set; }

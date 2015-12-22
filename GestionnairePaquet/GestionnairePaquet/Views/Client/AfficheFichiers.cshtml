@@ -1,0 +1,34 @@
+﻿@model IEnumerable<GestionnairePaquet.Models.Fichier>
+
+@if (Model.Count() > 0)
+{
+    <div class="contenu-version">
+        <p>@ViewBag.ChangeLog</p>
+
+        <table class="table">
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            var item = Model.ElementAt(i);
+
+
+            <tr>
+                <td>
+                    <img src="~/Content/Images/@item.Icone" alt="icone extension" />
+                </td>
+                <td>
+                    <p>@item.Nom</p>
+                </td>
+                <td>
+                    @item.DateVersion.ToString("dd/MM/yyyy HH:mm:ss")
+                </td>
+                <td>
+                    @item.Taille.ToString()
+                </td>
+                <td>
+                    @Html.ActionLink("Telecharger", "TelechargeFichier", new { fichier = item.Nom + "." + item.Extension }, htmlAttributes: new { @class = "btn btn-primary" }) 
+                </td>
+            </tr>
+        }
+        </table>
+    </div>
+}

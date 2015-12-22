@@ -198,6 +198,10 @@
     <Compile Include="Migrations\201512202104579_Validation.Designer.cs">
       <DependentUpon>201512202104579_Validation.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201512221711318_AjoutIconeFichier.cs" />
+    <Compile Include="Migrations\201512221711318_AjoutIconeFichier.Designer.cs">
+      <DependentUpon>201512221711318_AjoutIconeFichier.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Fichier.cs" />
@@ -212,8 +216,12 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Images\ic_apk.png" />
+    <Content Include="Content\Images\ic_flamingsoftware.png" />
+    <Content Include="Content\Images\ic_pdf.png" />
     <Content Include="Content\Images\ic_plastprodapp.png" />
-    <Content Include="Content\Images\Logo_Flaming_Software.png" />
+    <Content Include="Content\Images\ic_txt.png" />
+    <Content Include="Content\Images\ic_word.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -224,6 +232,8 @@
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -274,6 +284,7 @@
     <Content Include="Views\Admin\CompteDelete.cshtml" />
     <Content Include="Views\Client\Index.cshtml" />
     <Content Include="Views\Client\Version.cshtml" />
+    <Content Include="Views\Client\AfficheFichiers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -296,6 +307,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512202104579_Validation.resx">
       <DependentUpon>201512202104579_Validation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512221711318_AjoutIconeFichier.resx">
+      <DependentUpon>201512221711318_AjoutIconeFichier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
