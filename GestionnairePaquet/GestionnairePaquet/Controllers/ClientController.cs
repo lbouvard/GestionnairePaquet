@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace GestionnairePaquet.Controllers
 {
+    [Authorize]
     public class ClientController : BaseController
     {
         /// <summary>

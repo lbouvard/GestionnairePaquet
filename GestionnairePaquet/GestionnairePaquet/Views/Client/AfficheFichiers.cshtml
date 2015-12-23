@@ -22,7 +22,7 @@
                     @item.DateVersion.ToString("dd/MM/yyyy HH:mm:ss")
                 </td>
                 <td>
-                    @item.Taille.ToString()
+                    @string.Concat((item.Taille / 1000).ToString(), " Ko")
                 </td>
                 <td>
                     @Html.ActionLink("Telecharger", "TelechargeFichier", new { fichier = item.Nom + "." + item.Extension }, htmlAttributes: new { @class = "btn btn-primary" }) 

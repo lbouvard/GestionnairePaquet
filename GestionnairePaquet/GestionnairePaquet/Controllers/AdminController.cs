@@ -7,22 +7,138 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using GestionnairePaquet.Models;
-using Microsoft.AspNet.Identity.Owin;
+using GestionnairePaquet.Helpers;
+using System.IO;
 
 namespace GestionnairePaquet.Controllers
 {
+
+    public class Navigation
+    {
+        public int Id { get; set; }
+        public string Nom { get; set; }
+    }
+
     public class AdminController : BaseController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Admin
-        public ActionResult Index()
+        // GET: GereCompte
+        public ActionResult GereCompte()
         {
             return View(db.Societes.ToList());
         }
 
-        // GET: Admin/Details/5
-        public ActionResult Details(int? id)
+        // GET: GereFichier
+        public ActionResult GereFichier(int id)
+        {
+            //init pour le dossier racine
+            if( id == 1)
+            {
+                System.Web.HttpContext.Current.Session["historiqueNavigation"] = null;
+            }
+
+            var dossierEnCours = (from d in db.Dossiers where d.ID == id select d).FirstOrDefault();
+            HistoriseNavigation(new Navigation { Id = dossierEnCours.ID, Nom = dossierEnCours.Nom });
+
+            System.Web.HttpContext.Current.Session["niveauDossier"] = id.ToString();
+             
+            List<Dossier> liste = (from d in db.Dossiers
+                                   where d.ParentID == id
+                                   select d).ToList();
+            return View(liste);
+        }
+
+        /// <summary>
+        /// Permet de générer l'arboresence des dossiers (seulement lors de la première migration)
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GenereArbo()
+        {
+            //racine
+            string racine = "~/Content/";
+            GenererDossier(-1, ref racine);
+
+            return RedirectToAction("GereFichier", "Admin", new { id = 1 });
+        }
+
+        // POST: TraiteChargement
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult TraiteChargement(IEnumerable<HttpPostedFileBase> fichiers)
+        {
+            if (fichiers != null)
+            {
+                foreach (var fichier in fichiers)
+                {
+                    if (fichier != null && fichier.ContentLength > 0)
+                    {
+                        string pic = System.IO.Path.GetFileName(fichier.FileName);
+                        string path = System.IO.Path.Combine(
+                                               Server.MapPath("~/Content/Fichiers/"), pic);
+                        // file is uploaded
+                        fichier.SaveAs(path);
+                    }
+                }
+            }
+            // after successfully uploading redirect the user
+            var id_encours = System.Web.HttpContext.Current.Session["sessionString"] as String;
+            return RedirectToAction("GereFichier", "Admin", new { id = int.Parse(id_encours)});
+        }
+
+        /// <summary>
+        /// Permet d'ajouter un dossier physiquement et en base
+        /// </summary>
+        /// <returns></returns>
+        // POST: CreateDossier
+        [HttpPost]
+        public ActionResult CreateDossier()
+        {
+            int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+
+            //Création physique
+            var path = Server.MapPath(GenererCheminPourDossier(Request.Form["nomDossier"]));
+            Directory.CreateDirectory(path);
+
+            //Enregistrement en base
+            var dossier = new Dossier { Nom = Request.Form["nomDossier"].ToString(), ParentID = idDossierParent, EstCree = true };
+            db.Dossiers.Add(dossier);
+            db.SaveChanges();
+
+            return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+        }
+
+        /// <summary>
+        /// Permet de supprimer un dossier et tous ses enfants physiquement et en base.
+        /// </summary>
+        /// <param name="id">id du dossier ou du fichier</param>
+        /// <returns></returns>
+        public ActionResult DeleteFichier(int id)
+        {
+            int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+
+            //récupération du dossier ou fichier
+            Dossier dossier = db.Dossiers.Find(id);
+
+            if( dossier != null)
+            {
+                //suppression physique
+                var path = Server.MapPath(GenererCheminPourDossier(dossier.Nom));
+                Directory.Delete(path, true);
+
+                //suppression en base
+                SupprimerDossierRecursif(dossier.ID);
+                db.Dossiers.Remove(dossier);
+                db.SaveChanges();
+
+                Success(string.Format("La dossier {0} a été supprimé avec succès.", dossier.Nom), true);
+            }
+
+            return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+        }
+
+        // GET: Admin/DetailsSociete/5
+        public ActionResult DetailsSociete(int? id)
         {
             if (id == null)
             {
@@ -36,18 +152,16 @@ namespace GestionnairePaquet.Controllers
             return View(societe);
         }
 
-        // GET: Admin/Create
-        public ActionResult Create()
+        // GET: Admin/CreateSociete
+        public ActionResult CreateSociete()
         {
             return View();
         }
 
-        // POST: Admin/Create
-        // Afin de déjouer les attaques par sur-validation, activez les propriétés spécifiques que vous voulez lier. Pour 
-        // plus de détails, voir  http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Admin/CreateSociete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Nom,Adresse,CodePostal,Ville")] Societe societe)
+        public ActionResult CreateSociete([Bind(Include = "ID,Nom,Adresse,CodePostal,Ville")] Societe societe)
         {
             if (ModelState.IsValid)
             {
@@ -61,8 +175,8 @@ namespace GestionnairePaquet.Controllers
             return View(societe);
         }
 
-        // GET: Admin/Edit/5
-        public ActionResult Edit(int? id)
+        // GET: Admin/EditSociete/5
+        public ActionResult EditSociete(int? id)
         {
             if (id == null)
             {
@@ -76,12 +190,10 @@ namespace GestionnairePaquet.Controllers
             return View(societe);
         }
 
-        // POST: Admin/Edit/5
-        // Afin de déjouer les attaques par sur-validation, activez les propriétés spécifiques que vous voulez lier. Pour 
-        // plus de détails, voir  http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Admin/EditSociete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Nom,Adresse,CodePostal,Ville")] Societe societe)
+        public ActionResult EditSociete([Bind(Include = "ID,Nom,Adresse,CodePostal,Ville")] Societe societe)
         {
             if (ModelState.IsValid)
             {
@@ -95,8 +207,8 @@ namespace GestionnairePaquet.Controllers
             return View(societe);
         }
 
-        // GET: Admin/Delete/5
-        public ActionResult Delete(int? id)
+        // GET: Admin/DeleteSociete/5
+        public ActionResult DeleteSociete(int? id)
         {
             if (id == null)
             {
@@ -110,10 +222,10 @@ namespace GestionnairePaquet.Controllers
             return View(societe);
         }
 
-        // POST: Admin/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Admin/DeleteSociete/5
+        [HttpPost, ActionName("DeleteSociete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteSocieteConfirmed(int id)
         {
             Societe societe = db.Societes.Find(id);
             db.Societes.Remove(societe);
@@ -170,6 +282,177 @@ namespace GestionnairePaquet.Controllers
             Success(string.Format("Le compte {0} a été supprimée de la base.", nom), true);
 
             return RedirectToAction("Comptes", new { Id = utilisateur.SocieteId });
+        }
+
+        /// <summary>
+        /// Fonction récursive qui permet de créer physiquement les dossiers
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="chemin_temp"></param>
+        private void GenererDossier(int id, ref string chemin_temp)
+        {
+            //Sélection des dossiers du parent (id) 
+            var liste = (from d in db.Dossiers
+                        where d.ParentID == id
+                        select d).ToList();
+
+            if( liste.Count() > 0)
+            {
+                foreach( var el in liste)
+                {
+                    //Création du dossier
+                    var path = Server.MapPath(chemin_temp + el.Nom);
+                    Directory.CreateDirectory(path);
+
+                    //Indique que le dossier est traité
+                    var query = from d in db.Dossiers where d.ID == el.ID select d;
+                    var dossier = query.FirstOrDefault();
+
+                    if( dossier != null)
+                    {
+                        dossier.EstCree = true;
+                        db.SaveChanges();
+                    }
+
+                    //Sauvegarde du nouveau chemin
+                    chemin_temp += el.Nom + "/";
+
+                    //on parcours en recursif les sous dossiers du dossier parent
+                    GenererDossier(el.ID, ref chemin_temp);
+                }
+
+                //fin du chemin
+                chemin_temp = chemin_temp.Substring(0, chemin_temp.LastIndexOf("/"));
+                //dossier parent
+                chemin_temp = chemin_temp.Substring(0, chemin_temp.LastIndexOf("/") + 1);
+            }
+            else
+            {
+                //fin du chemin
+                chemin_temp = chemin_temp.Substring(0, chemin_temp.LastIndexOf("/"));
+                //dossier parent
+                chemin_temp = chemin_temp.Substring(0, chemin_temp.LastIndexOf("/") + 1);
+            }
+        }
+
+        /// <summary>
+        /// Permet de tracer la navigation client afin de positionner correctement le fil d'ariane et le chemin du dossier ou des fichiers
+        /// </summary>
+        /// <param name="element"></param>
+        private void HistoriseNavigation(Navigation element)
+        {
+            List<Navigation> liste = (List<Navigation>)System.Web.HttpContext.Current.Session["historiqueNavigation"];
+
+            if (liste != null)
+            {
+                var index = liste.FindIndex(item => item.Nom == element.Nom);
+                
+                if( index != -1)
+                {
+                    SupprimerFils(liste, index + 1);
+                }
+                else
+                {
+                    AjouterFil(liste, element);
+                }
+            }
+            else
+            {
+                liste = new List<Navigation>();
+                AjouterFil(liste, element);
+                System.Web.HttpContext.Current.Session["historiqueNavigation"] = liste;
+            }
+
+            GenererFilAriane(liste);
+        }
+
+        /// <summary>
+        /// Permet d'ajouter un niveau au fil d'arianne
+        /// </summary>
+        /// <param name="liste"></param>
+        /// <param name="item"></param>
+        private void AjouterFil(List<Navigation> liste, Navigation item)
+        {
+            liste.Add(item);
+        }
+
+        /// <summary>
+        /// Permet de supprimer les niveaux supérieurs à la position en cours du fil d'arianne
+        /// </summary>
+        /// <param name="liste"></param>
+        /// <param name="position"></param>
+        private void SupprimerFils(List<Navigation> liste, int position)
+        {
+            liste.RemoveRange(position, liste.Count() - position);
+        }
+
+        /// <summary>
+        /// Génére le fil d'ariane en html avec bootstrap
+        /// </summary>
+        /// <param name="liste"></param>
+        private void GenererFilAriane(List<Navigation> liste)
+        {
+            FilArianeHelper fileAriane = new FilArianeHelper();
+
+            foreach( var item in liste)
+            {
+                fileAriane.AddNode(Url.Action("GereFichier", "Admin", new { id = item.Id }, "http"), item.Nom);
+            }
+
+            //Génération html
+            ViewBag.FilAriane = fileAriane.Output();
+        }
+
+        /// <summary>
+        /// Permet de recontistuer le chemin physique du dossier ou fichier demandé
+        /// </summary>
+        /// <param name="nouveauDossier"></param>
+        /// <returns></returns>
+        private string GenererCheminPourDossier(string nouveauDossier)
+        {
+            string retour = "~/Content/";
+
+            List<Navigation> liste = (List<Navigation>)System.Web.HttpContext.Current.Session["historiqueNavigation"];
+
+            foreach(Navigation item in liste)
+            {
+                retour += item.Nom + "/";
+            }
+
+            retour += nouveauDossier;
+
+            return retour;
+        }
+
+        /// <summary>
+        /// Permet de supprimer en base les éléments fils d'un dossier à supprimer
+        /// </summary>
+        /// <param name="idOrigine"></param>
+        private void SupprimerDossierRecursif(int idOrigine)
+        {
+            //Sélection des dossiers du parent (id) 
+            var liste = (from d in db.Dossiers
+                         where d.ParentID == idOrigine
+                         select d).ToList();
+
+            if (liste.Count() > 0)
+            {
+                foreach (var el in liste)
+                {
+                    //Suppression du dossier
+                    var query = from d in db.Dossiers where d.ID == el.ID select d;
+                    var dossier = query.FirstOrDefault();
+
+                    if (dossier != null)
+                    {
+                        db.Dossiers.Remove(dossier);
+                        db.SaveChanges();
+                    }
+
+                    //on parcours en recursif les sous dossiers du dossier parent
+                    SupprimerDossierRecursif(el.ID);
+                }
+            }
         }
 
         protected override void Dispose(bool disposing)

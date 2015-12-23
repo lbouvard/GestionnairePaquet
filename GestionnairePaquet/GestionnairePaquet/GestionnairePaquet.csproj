@@ -186,6 +186,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AlertHelper.cs" />
+    <Compile Include="Helpers\FilArianeHelper.cs" />
     <Compile Include="Migrations\201512161903132_MigrationInitiale.cs" />
     <Compile Include="Migrations\201512161903132_MigrationInitiale.Designer.cs">
       <DependentUpon>201512161903132_MigrationInitiale.cs</DependentUpon>
@@ -202,8 +203,13 @@
     <Compile Include="Migrations\201512221711318_AjoutIconeFichier.Designer.cs">
       <DependentUpon>201512221711318_AjoutIconeFichier.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201512230653333_AjoutDossier.cs" />
+    <Compile Include="Migrations\201512230653333_AjoutDossier.Designer.cs">
+      <DependentUpon>201512230653333_AjoutDossier.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Dossier.cs" />
     <Compile Include="Models\Fichier.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -225,7 +231,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -278,13 +284,14 @@
     <Content Include="Views\Admin\Delete.cshtml" />
     <Content Include="Views\Admin\Details.cshtml" />
     <Content Include="Views\Admin\Edit.cshtml" />
-    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\GereCompte.cshtml" />
     <Content Include="Views\Admin\Comptes.cshtml" />
     <Content Include="Views\Shared\_Alerts.cshtml" />
     <Content Include="Views\Admin\CompteDelete.cshtml" />
     <Content Include="Views\Client\Index.cshtml" />
     <Content Include="Views\Client\Version.cshtml" />
     <Content Include="Views\Client\AfficheFichiers.cshtml" />
+    <Content Include="Views\Admin\GereFichier.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -310,6 +317,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201512221711318_AjoutIconeFichier.resx">
       <DependentUpon>201512221711318_AjoutIconeFichier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201512230653333_AjoutDossier.resx">
+      <DependentUpon>201512230653333_AjoutDossier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

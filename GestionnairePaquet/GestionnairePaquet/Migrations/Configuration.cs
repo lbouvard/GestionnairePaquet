@@ -119,7 +119,24 @@ namespace GestionnairePaquet.Migrations
                 }
                 //context.SaveChanges();
             }
-            
+
+            //Génération d'une arborescence de test
+            var dossiers = new List<Dossier>
+            {
+                new Dossier { Nom = "Fichiers", ParentID = -1 },
+                new Dossier { Nom = "Arc", ParentID = 1 },
+                new Dossier { Nom = "PlastProd", ParentID = 1 },
+                new Dossier { Nom = "Societe1", ParentID = 1 },
+                new Dossier { Nom = "ImotepApp", ParentID = 2 },
+                new Dossier { Nom = "PlastProdApp", ParentID = 3 },
+                new Dossier { Nom = "1.0", ParentID = 5 },
+                new Dossier { Nom = "2.0", ParentID = 5 },
+                new Dossier { Nom = "1.0", ParentID = 6 },
+                new Dossier { Nom = "2.0", ParentID = 6 }
+            };
+            dossiers.ForEach(s => context.Dossiers.AddOrUpdate(p => new { p.Nom, p.ParentID }, s));
+            context.SaveChanges();
+
         }
     }
 }

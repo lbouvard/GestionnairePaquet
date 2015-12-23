@@ -1,0 +1,66 @@
+﻿@model IEnumerable<GestionnairePaquet.Models.Dossier>
+
+@{
+    ViewBag.Title = "Gestion des Fichiers";
+}
+<ol class="breadcrumb">
+    @ViewBag.FilAriane
+</ol>
+<h2>Gestion des fichiers</h2>
+<p>
+    <!-- Small modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#fenetreAjoutDossier">Ajouter un dossier</button>
+
+    <div class="modal fade" id="fenetreAjoutDossier" role="dialog">
+        <div class="modal-dialog modal-sm">
+            @using (Html.BeginForm("CreateDossier", "Admin", FormMethod.Post))
+            {
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h4 class="modal-title">Ajout d'un dossier</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label for="nomDossier">Nom du dossier</label>
+                            <input type="text" class="form-control" id="nomDossier" name="nomDossier">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                        <input type="submit" class="btn btn-primary" value="Valider" />
+                    </div>
+                 </div>
+            }
+        </div>
+    </div>
+
+    @Html.ActionLink("Générer arborescence", "GenereArbo", "Admin")
+</p>
+
+<div class="list-group">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item">
+            @Html.ActionLink(item.Nom, "GereFichier", "Admin", new { id = item.ID }, null)
+
+            <a href="@Url.Action("DeleteFichier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Supprimer le dossier">
+                <span class="glyphicon glyphicon glyphicon-trash"></span>
+            </a>
+
+            <a href="@Url.Action("RenameFichier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Renommer le dossier">
+                <span class="glyphicon glyphicon glyphicon-pencil"></span>
+            </a>
+        </li>
+    }
+</div>
+
+@using (Html.BeginForm("TraiteChargement", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="file" name="fichiers" id="fichiers" /><br />
+    <input type="submit" name="Submit" id="Submit" value="Upload" />
+}

@@ -49,6 +49,7 @@ namespace GestionnairePaquet.Models
         public DbSet<Societe> Societes { get; set; }
         public DbSet<Produit> Produits { get; set; }
         public DbSet<Version> Versions { get; set; }
+        public DbSet<Dossier> Dossiers { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
