@@ -1,6 +1,13 @@
-﻿body {
+﻿html {
+  position: relative;
+  height: 100%;
+}
+
+body {
     padding-top: 50px;
     padding-bottom: 20px;
+    height: 100%;
+    margin: 0;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -16,6 +23,11 @@
     white-space: normal;
 }
 
+input[class="upload_texte"] {
+    max-width: 400px;
+    width: 100%;
+}
+
 /* Set width on the form input elements since they're 100% wide by default */
 input,
 select,
@@ -27,4 +39,157 @@ textarea {
     float: right;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+input[id*="upload_input"] {
+    position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+	height: 100%;
+	text-align: center;
+}
+
+.upload_texte {
+    border: none;
+    margin-left: 10px; 
+    height: 30px;
+}
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 5px;
+}
+
+.dossier-gras {
+    font-weight: bold;
+}
+
+/* Hack bootstrap */
+
+
+.navbar-inverse {
+  background-color: #e48b00;
+  border-color: #e48b00;
+
+}
+
+.navbar-inverse .navbar-text {
+    color: #ffffff;
+}
+
+.navbar-inverse .navbar-brand {
+  color: #333333;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #333333;
+}
+
+.well {
+    background-color: white;
+    border: none;
+    min-height: 100%;
+}
+
+.well2 {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin: 0;
+    background-color: #e48b00;
+    /* Set the fixed height of the footer here */
+    height: 100px;
+}
+
+hr {
+    border-top: none;
+}
+
+footer .box {
+    width: 300px;
+    margin: 20px auto 0;
+    position: relative;
+}
+
+footer .box .column div:first-child {
+    color: #796767;
+    font-weight: bold;
+    font-size: 14px !important;
+}
+
+footer .box .column div+div {
+    margin-top: 4px;
+}
+
+footer a:hover, footer a:visited {
+    color: white;
+}
+
+footer a {
+    color: white;
+}
+
+footer, footer a {
+    font-size: 10pt;
+}
+
+.row {
+    text-align: center;
+}
+
+.img-responsive {
+    margin: auto;
+}
+
+.panel-login {
+	border-color: #000000;
+}
+.panel-login>.panel-heading {
+	background-color: #e48b00;
+	border: none;
+	text-align:left;
+}
+.panel-login>.panel-heading span{
+    color: #00415d;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
+	height: 45px;
+	border: 1px solid #ddd;
+	font-size: 16px;
+	-webkit-transition: all 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	transition: all 0.1s linear;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    color: #333;
+    background-color: #FFCC00;
+}
+
+.navbar-inverse .navbar-nav > .dropdown > a .caret {
+    border-top-color: #333;
+    border-bottom-color: #333;
+}
+
+.navbar-inverse .navbar-nav > .open > a .caret, .navbar-inverse .navbar-nav > .open > a:hover .caret, .navbar-inverse .navbar-nav > .open > a:focus .caret {
+    border-top-color: #333;
+    border-bottom-color: #333;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #e48b00;
 }

@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
@@ -45,11 +45,15 @@
         <hr />
         
     </div>
-    <div class="container body-content">
+    <div class="container-fluid body-content well2">
         <footer>
-            <p>Copyright &copy;@DateTime.Now.Year FlamingSoftware.com</p>
-            <p>@Html.ActionLink("A propos", "APropos", "Accueil")</p>
-            <p>@Html.ActionLink("FAQ", "Faq", "Accueil")</p>
+            <div class="box">
+                <div class="column">
+                    <div>&copy;@DateTime.Now.Year FlamingSoftware.com</div>
+                    <div>@Html.ActionLink("A propos de nous", "APropos", "Home")</div>
+                    <div>@Html.ActionLink("Question réponse", "Faq", "Home")</div>
+                </div>
+            </div>
         </footer>
     </div> 
     
@@ -70,6 +74,33 @@
             var element = "#collapse" + str;
 
             $(element).collapse('show');
+        });
+
+        $('[id*="rename_dossier_"]').click(function () {
+            //on recupère l'id
+            var str = $(this)[0].id;
+            str = str.substring(str.lastIndexOf("_") + 1);
+
+            $('#idDossierActuel')[0].value = Number(str);
+        });
+
+        $('[id*="rename_fichier_"]').click(function () {
+            //on recupère l'id
+            var str = $(this)[0].id;
+            str = str.substring(str.lastIndexOf("_") + 1);
+
+            $('#idFichierActuel')[0].value = Number(str);
+        });
+
+        $('[id*="upload_input_"]').change(function () {
+            //on recupère l'id
+            var str = $(this)[0].id;
+            var path = $(this)[0].value;
+            path = path.substring(path.lastIndexOf("\\") + 1);
+
+            str = str.substring(str.lastIndexOf("_") + 1);
+            str = "#input_up_" + str;
+            $(str)[0].value = path;
         });
     });
     </script>

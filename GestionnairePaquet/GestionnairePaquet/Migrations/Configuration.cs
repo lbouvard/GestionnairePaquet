@@ -9,7 +9,7 @@ namespace GestionnairePaquet.Migrations
     using Microsoft.AspNet.Identity.EntityFramework;
     using Microsoft.AspNet.Identity;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<GestionnairePaquet.Models.ApplicationDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
     {
         public Configuration()
         {
@@ -17,7 +17,7 @@ namespace GestionnairePaquet.Migrations
         }
 
         //Insertion des données de test
-        protected override void Seed(GestionnairePaquet.Models.ApplicationDbContext context)
+        protected override void Seed(ApplicationDbContext context)
         {
             // Insertion de trois société
             var societes = new List<Societe>
@@ -124,15 +124,15 @@ namespace GestionnairePaquet.Migrations
             var dossiers = new List<Dossier>
             {
                 new Dossier { Nom = "Fichiers", ParentID = -1 },
-                new Dossier { Nom = "Arc", ParentID = 1 },
-                new Dossier { Nom = "PlastProd", ParentID = 1 },
-                new Dossier { Nom = "Societe1", ParentID = 1 },
-                new Dossier { Nom = "ImotepApp", ParentID = 2 },
-                new Dossier { Nom = "PlastProdApp", ParentID = 3 },
-                new Dossier { Nom = "1.0", ParentID = 5 },
-                new Dossier { Nom = "2.0", ParentID = 5 },
-                new Dossier { Nom = "1.0", ParentID = 6 },
-                new Dossier { Nom = "2.0", ParentID = 6 }
+                new Dossier { Nom = "Arc", ParentID = 1, TypeDossier = Models.TypeDossier.Societe },
+                new Dossier { Nom = "PlastProd", ParentID = 1, TypeDossier = Models.TypeDossier.Societe },
+                new Dossier { Nom = "Societe1", ParentID = 1, TypeDossier = Models.TypeDossier.Societe },
+                new Dossier { Nom = "ImotepApp", ParentID = 2, TypeDossier = Models.TypeDossier.Produit },
+                new Dossier { Nom = "PlastProdApp", ParentID = 3, TypeDossier = Models.TypeDossier.Produit },
+                new Dossier { Nom = "1.0", ParentID = 5, TypeDossier = Models.TypeDossier.Version },
+                new Dossier { Nom = "2.0", ParentID = 5, TypeDossier = Models.TypeDossier.Version },
+                new Dossier { Nom = "1.0", ParentID = 6, TypeDossier = Models.TypeDossier.Version },
+                new Dossier { Nom = "2.0", ParentID = 6, TypeDossier = Models.TypeDossier.Version }
             };
             dossiers.ForEach(s => context.Dossiers.AddOrUpdate(p => new { p.Nom, p.ParentID }, s));
             context.SaveChanges();

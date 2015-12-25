@@ -5,7 +5,7 @@
 }
 <h2>Gestion des clients</h2>
 <p>
-    @Html.ActionLink("Ajouter un nouveau client", "Create")
+    @Html.ActionLink("Ajouter un nouveau client", "CreateSociete")
 </p>
 <table class="table">
     <tr>
@@ -39,9 +39,9 @@
             @Html.DisplayFor(modelItem => item.Ville)
         </td>
         <td>
-            @Html.ActionLink("Modifier", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Détails", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Supprimer", "Delete", new { id=item.ID }) |
+            @Html.ActionLink("Modifier", "EditSociete", new { id=item.ID }) |
+            @Html.ActionLink("Détails", "DetailsSociete", new { id=item.ID }) |
+            @Html.ActionLink("Supprimer", "DeleteSociete", new { id=item.ID }) |
             @Html.ActionLink("Comptes", "Comptes", new { id=item.ID })
         </td>
     </tr>

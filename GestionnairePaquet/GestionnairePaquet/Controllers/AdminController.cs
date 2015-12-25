@@ -45,6 +45,7 @@ namespace GestionnairePaquet.Controllers
              
             List<Dossier> liste = (from d in db.Dossiers
                                    where d.ParentID == id
+                                   orderby d.EstDossier descending, d.Nom
                                    select d).ToList();
             return View(liste);
         }
@@ -62,27 +63,60 @@ namespace GestionnairePaquet.Controllers
             return RedirectToAction("GereFichier", "Admin", new { id = 1 });
         }
 
+        /// <summary>
+        /// Permet d'uploader les fichiers.
+        /// </summary>
+        /// <param name="fichiers"></param>
+        /// <returns></returns>
         // POST: TraiteChargement
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult TraiteChargement(IEnumerable<HttpPostedFileBase> fichiers)
         {
+            var id_encours = System.Web.HttpContext.Current.Session["niveauDossier"].ToString();
+            Dossier dos = db.Dossiers.Find(id_encours);
+
+            if( dos != null)
+            {
+                if( dos.TypeDossier != TypeDossier.Version)
+                {
+                    Warning(string.Format("Vous ne pouvez pas charger les fichier sous le dossier {0}. Seule les versions peuvent contenir des fichiers.", dos.Nom), true);
+                    return RedirectToAction("GereFichier", "Admin", new { id = int.Parse(id_encours) });
+                }
+            }
+            else
+            {
+                Danger("Une erreur s'est produite sur le serveur. Veuillez contacter le support.", true);
+                return RedirectToAction("GereFichier", "Admin", new { id = int.Parse(id_encours) });
+            }
+
+            //Si des fichiers sont envoyé
             if (fichiers != null)
             {
+                //Pour chaque fichier envoyé
                 foreach (var fichier in fichiers)
                 {
+                    //si c'est un fichier valide
                     if (fichier != null && fichier.ContentLength > 0)
                     {
+                        //on récupère le nom du fichier
                         string pic = System.IO.Path.GetFileName(fichier.FileName);
-                        string path = System.IO.Path.Combine(
-                                               Server.MapPath("~/Content/Fichiers/"), pic);
-                        // file is uploaded
+
+                        //on récupère le chemin complet pour enregistre le fichier sur le serveur
+                        string path = Server.MapPath(GenererCheminPourDossier(pic));
+
+                        //on enregistre le fichier
                         fichier.SaveAs(path);
+
+                        //enregistrement en base
+                        var nouveauFichier = new Dossier { Nom = fichier.FileName, ParentID = int.Parse(id_encours), EstCree = true, EstDossier = false };
+                        db.Dossiers.Add(nouveauFichier);
+                        db.SaveChanges();
                     }
                 }
             }
-            // after successfully uploading redirect the user
-            var id_encours = System.Web.HttpContext.Current.Session["sessionString"] as String;
+
+            //On retourne sur la page
             return RedirectToAction("GereFichier", "Admin", new { id = int.Parse(id_encours)});
         }
 
@@ -90,41 +124,104 @@ namespace GestionnairePaquet.Controllers
         /// Permet d'ajouter un dossier physiquement et en base
         /// </summary>
         /// <returns></returns>
-        // POST: CreateDossier
         [HttpPost]
         public ActionResult CreateDossier()
         {
             int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+            TypeDossier typedossier = TypeDossier.Societe;
 
             //Création physique
             var path = Server.MapPath(GenererCheminPourDossier(Request.Form["nomDossier"]));
             Directory.CreateDirectory(path);
 
-            //Enregistrement en base
-            var dossier = new Dossier { Nom = Request.Form["nomDossier"].ToString(), ParentID = idDossierParent, EstCree = true };
+            //Enregistrement en base - on regarde le type de dossier parent pour déterminer le type du nouveau dossier
+            var dossierParent = (from d in db.Dossiers where d.ID == idDossierParent select d).FirstOrDefault();
+            
+            if( dossierParent != null)
+            {
+                if( dossierParent.TypeDossier == TypeDossier.Societe)
+                {
+                    typedossier = TypeDossier.Produit;
+                }
+                else if( dossierParent.TypeDossier == TypeDossier.Produit)
+                {
+                    typedossier = TypeDossier.Version;
+                }
+                else if( dossierParent.TypeDossier == null)
+                {
+                    typedossier = TypeDossier.Societe;
+                }
+                else
+                {
+                    //impossible de créer un dossier
+                    Warning("Vous ne pouvez pas rajouter un niveau d'arborescence. Les versions sont le niveau maximal.", true);
+                    return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+                }
+            } 
+
+            var dossier = new Dossier { Nom = Request.Form["nomDossier"].ToString(), ParentID = idDossierParent, EstCree = true, EstDossier = true, TypeDossier = typedossier };
             db.Dossiers.Add(dossier);
             db.SaveChanges();
+
+            Success(string.Format("Le dossier {0} a été crée avec succès.", Request.Form["nomDossier"].ToString()), true);
+            return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+        }
+
+        /// <summary>
+        /// Permet de renommer un dossier
+        /// </summary>
+        /// <param name="id">Identifiant du dossier</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult RenameDossier()
+        {
+            int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+            
+            if( Request.Form["idDossierActuel"] != null)
+            {
+                var id = int.Parse(Request.Form["idDossierActuel"].ToString());
+                var dossier = (from d in db.Dossiers where d.ID == id select d).FirstOrDefault();
+
+                //On renomme physiquement
+                var pathOld = Server.MapPath(GenererCheminPourDossier(dossier.Nom));
+                var pathNew = Server.MapPath(GenererCheminPourDossier(Request.Form["nomNouveauDossier"]));
+                Directory.Move(pathOld, pathNew);
+
+                //On met à jour en base
+                if( dossier != null)
+                {
+                    dossier.Nom = Request.Form["nomNouveauDossier"].ToString();
+                    db.SaveChanges();
+                }
+            }
 
             return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
         }
 
         /// <summary>
-        /// Permet de supprimer un dossier et tous ses enfants physiquement et en base.
+        /// Permet de supprimer un dossier et tous ses enfants (physiquement et logiquement)
         /// </summary>
-        /// <param name="id">id du dossier ou du fichier</param>
+        /// <param name="id">id du dossier</param>
         /// <returns></returns>
-        public ActionResult DeleteFichier(int id)
+        public ActionResult DeleteDossier(int id)
         {
             int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
 
             //récupération du dossier ou fichier
             Dossier dossier = db.Dossiers.Find(id);
 
-            if( dossier != null)
+            if (dossier != null)
             {
                 //suppression physique
-                var path = Server.MapPath(GenererCheminPourDossier(dossier.Nom));
-                Directory.Delete(path, true);
+                try
+                {
+                    var path = Server.MapPath(GenererCheminPourDossier(dossier.Nom));
+                    Directory.Delete(path, true);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
 
                 //suppression en base
                 SupprimerDossierRecursif(dossier.ID);
@@ -132,6 +229,65 @@ namespace GestionnairePaquet.Controllers
                 db.SaveChanges();
 
                 Success(string.Format("La dossier {0} a été supprimé avec succès.", dossier.Nom), true);
+            }
+
+            return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+        }
+
+        /// <summary>
+        /// Permet de renommer un fichier
+        /// </summary>
+        /// <param name="id">Identifiant du fichier</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult RenameFichier()
+        {
+            int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+
+            if (Request.Form["idFichierActuel"] != null)
+            {
+                var id = int.Parse(Request.Form["idFichierActuel"].ToString());
+                var fichier = (from d in db.Dossiers where d.ID == id select d).FirstOrDefault();
+
+                //On renomme physiquement
+                var pathOld = Server.MapPath(GenererCheminPourDossier(fichier.Nom));
+                var pathNew = Server.MapPath(GenererCheminPourDossier(Request.Form["nomNouveauFichier"]));
+                Directory.Move(pathOld, pathNew);
+
+                //On met à jour en base
+                if (fichier != null)
+                {
+                    fichier.Nom = Request.Form["nomNouveauFichier"].ToString();
+                    db.SaveChanges();
+                }
+            }
+
+            return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
+        }
+
+        /// <summary>
+        /// Permet de supprimer un fichier (physiquement et en base).
+        /// </summary>
+        /// <param name="id">id du fichier</param>
+        /// <returns></returns>
+        public ActionResult DeleteFichier(int id)
+        {
+            int idDossierParent = int.Parse(System.Web.HttpContext.Current.Session["niveauDossier"] as string);
+
+            //récupération du fichier
+            Dossier fichier = db.Dossiers.Find(id);
+
+            if(fichier != null)
+            {
+                //suppression physique
+                var path = Server.MapPath(GenererCheminPourDossier(fichier.Nom));
+                System.IO.File.Delete(path);
+
+                //suppression en base
+                db.Dossiers.Remove(fichier);
+                db.SaveChanges();
+
+                Success(string.Format("La fichier {0} a été supprimé avec succès.", fichier.Nom), true);
             }
 
             return RedirectToAction("GereFichier", "Admin", new { id = idDossierParent });
@@ -165,11 +321,27 @@ namespace GestionnairePaquet.Controllers
         {
             if (ModelState.IsValid)
             {
+                //on enregistre la nouvelle société
                 db.Societes.Add(societe);
+
+                //on crée le dossier physiquement et logiquement
+                db.Dossiers.Add(new Dossier { Nom = societe.Nom, EstCree = true, EstDossier = true, ParentID = -1, TypeDossier = TypeDossier.Societe });
+
                 db.SaveChanges();
 
+                //création du dossier physiquement
+                try
+                {
+                    var path = Server.MapPath(string.Concat("~/Content/Fichiers/", societe.Nom));
+                    Directory.CreateDirectory(path);
+                }
+                catch(Exception ex)
+                {
+                    Danger(string.Format("Erreur lors de la création du dossier {0} ({1}).", societe.Nom, ex.Message), true);
+                }
+
                 Success(String.Format("La société {0} a été créée avec succès.", societe.Nom), true);
-                return RedirectToAction("Index");
+                return RedirectToAction("GereCompte");
             }
 
             return View(societe);
@@ -196,13 +368,36 @@ namespace GestionnairePaquet.Controllers
         public ActionResult EditSociete([Bind(Include = "ID,Nom,Adresse,CodePostal,Ville")] Societe societe)
         {
             if (ModelState.IsValid)
-            {
+            {   
+                using( var bdd = new ApplicationDbContext() )
+                {
+                    //on verifie sur le nom de la société a été modifié
+                    Societe societeAvtModif = bdd.Societes.Find(societe.ID);
+                    //si c'est le cas, on renomme le dossier physiquement et logiquement
+                    if (societeAvtModif.Nom != societe.Nom)
+                    {
+                        var dossier = (from d in bdd.Dossiers where d.Nom == societeAvtModif.Nom select d).FirstOrDefault();
+
+                        if( dossier != null)
+                        {
+                            //On renomme physiquement
+                            var pathOld = Server.MapPath(string.Concat("~/Content/Fichiers/", dossier.Nom));
+                            var pathNew = Server.MapPath(string.Concat("~/Content/Fichiers/", societe.Nom));
+                            Directory.Move(pathOld, pathNew);
+
+                            dossier.Nom = societe.Nom;
+                            bdd.SaveChanges();
+                        }
+
+                    }
+                }
+
                 db.Entry(societe).State = EntityState.Modified;
                 db.SaveChanges();
 
                 Success(string.Format("La société {0} a été modifiée avec succès.", societe.Nom), true);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("GereCompte");
             }
             return View(societe);
         }
@@ -227,13 +422,38 @@ namespace GestionnairePaquet.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteSocieteConfirmed(int id)
         {
+            //On récupère la société à supprimmer
             Societe societe = db.Societes.Find(id);
+
+            //On supprime physiquement et logiquement le dossier lié à la société
+            //récupération du dossier ou fichier
+            Dossier dossier = (from d in db.Dossiers where d.Nom == societe.Nom select d).FirstOrDefault();
+
+            if (dossier != null)
+            {
+                //suppression physique
+                try
+                {
+                    var path = Server.MapPath(string.Concat("~/Content/Fichiers/", dossier.Nom));
+                    Directory.Delete(path, true);
+                }
+                catch (Exception ex)
+                {
+                    Warning(string.Format("Erreur dans la suppression du dossier {0} ({1}).", dossier.Nom, ex.Message));
+                }
+
+                //supprime logiquement
+                db.Dossiers.Remove(dossier);
+            }
+
+            //on supprimer la société
             db.Societes.Remove(societe);
+            //maj
             db.SaveChanges();
 
             Success(string.Format("La société {0} a été supprimée de la base.", societe.Nom), true);
-
-            return RedirectToAction("Index");
+      
+            return RedirectToAction("GereCompte");
         }
 
         // GET: Admin/Comptes/5

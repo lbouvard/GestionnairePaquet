@@ -3,64 +3,160 @@
 @{
     ViewBag.Title = "Gestion des Fichiers";
 }
+<h2>Gestion des fichiers</h2>
+
 <ol class="breadcrumb">
     @ViewBag.FilAriane
 </ol>
-<h2>Gestion des fichiers</h2>
+
 <p>
     <!-- Small modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#fenetreAjoutDossier">Ajouter un dossier</button>
-
-    <div class="modal fade" id="fenetreAjoutDossier" role="dialog">
-        <div class="modal-dialog modal-sm">
-            @using (Html.BeginForm("CreateDossier", "Admin", FormMethod.Post))
-            {
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h4 class="modal-title">Ajout d'un dossier</h4>
-                    </div>
-
-                    <div class="modal-body">
-                        @Html.AntiForgeryToken()
-                        <div class="form-group">
-                            <label for="nomDossier">Nom du dossier</label>
-                            <input type="text" class="form-control" id="nomDossier" name="nomDossier">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                        <input type="submit" class="btn btn-primary" value="Valider" />
-                    </div>
-                 </div>
-            }
-        </div>
-    </div>
-
-    @Html.ActionLink("Générer arborescence", "GenereArbo", "Admin")
+    @Html.ActionLink("Générer arborescence", "GenereArbo", "Admin", new { @class = "btn btn-warning" })
 </p>
+
+<div class="modal fade" id="fenetreAjoutDossier" role="dialog">
+    <div class="modal-dialog modal-sm">
+        @using (Html.BeginForm("CreateDossier", "Admin", FormMethod.Post))
+        {
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Ajout d'un dossier</h4>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="nomDossier">Nom du dossier</label>
+                        <input type="text" class="form-control" id="nomDossier" name="nomDossier">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                    <input type="submit" class="btn btn-primary" value="Valider" />
+                </div>
+                </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="fenetreRenommeDossier" role="dialog">
+    <div class="modal-dialog modal-sm">
+        @using (Html.BeginForm("RenameDossier", "Admin", FormMethod.Post ))
+        {
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Renommer le dossier</h4>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="nomDossier">Nom du dossier</label>
+                        <input type="text" class="form-control" id="nomNouveauDossier" name="nomNouveauDossier" />
+                        <input type="hidden" id="idDossierActuel" name="idDossierActuel" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                    <input type="submit" class="btn btn-primary" value="Valider" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="fenetreRenommeFichier" role="dialog">
+    <div class="modal-dialog modal-sm">
+        @using (Html.BeginForm("RenameFichier", "Admin", FormMethod.Post))
+        {
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Renommer le fichier</h4>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="nomDossier">Nom du fichier</label>
+                        <input type="text" class="form-control" id="nomNouveauFichier" name="nomNouveauFichier" />
+                        <input type="hidden" id="idFichierActuel" name="idFichierActuel" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                    <input type="submit" class="btn btn-primary" value="Valider" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
 <div class="list-group">
     @foreach (var item in Model)
     {
         <li class="list-group-item">
-            @Html.ActionLink(item.Nom, "GereFichier", "Admin", new { id = item.ID }, null)
+            @if (item.EstDossier)
+            {
+                @Html.ActionLink(item.Nom, "GereFichier", "Admin", new { id = item.ID }, new { @class = "dossier-gras" })
 
-            <a href="@Url.Action("DeleteFichier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Supprimer le dossier">
-                <span class="glyphicon glyphicon glyphicon-trash"></span>
-            </a>
+                <a href="@Url.Action("DeleteDossier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Supprimer le dossier">
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </a>
 
-            <a href="@Url.Action("RenameFichier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Renommer le dossier">
-                <span class="glyphicon glyphicon glyphicon-pencil"></span>
-            </a>
+                <a href="#" id="rename_dossier_@item.ID" class="icon_admin_ges_fic" data-toggle="modal" data-target="#fenetreRenommeDossier" title="Renommer le dossier">
+                    <span class="glyphicon glyphicon glyphicon-pencil"></span>
+                </a>
+            }
+            else
+            {
+                @item.Nom
+
+                <a href="@Url.Action("DeleteFichier", "Admin", new { id = item.ID })" class="icon_admin_ges_fic" data-toggle="tooltip" data-placement="bottom" title="Supprimer le fichier">
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </a>
+
+                <a href="#" id="rename_fichier_@item.ID" class="icon_admin_ges_fic" data-toggle="modal" data-target="#fenetreRenommeFichier" title="Renommer le fichier">
+                    <span class="glyphicon glyphicon glyphicon-pencil"></span>
+                </a>
+            }
         </li>
     }
 </div>
 
+<h3>Ajout de fichier(s)</h3>
+
 @using (Html.BeginForm("TraiteChargement", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    <input type="file" name="fichiers" id="fichiers" /><br />
-    <input type="submit" name="Submit" id="Submit" value="Upload" />
+    <div class="blocUpload">
+        <input class="upload_texte" id="input_up_1" placeholder="Choisir un fichier" disabled="disabled" />
+        <div class="fileUpload btn btn-default">
+            <span>...</span>
+            <input id="upload_input_1" type="file" name="fichiers"/>
+        </div>
+    </div>
+    <div class="blocUpload">
+        <input class="upload_texte" id="input_up_2" placeholder="Choisir un fichier" disabled="disabled" />
+        <div class="fileUpload btn btn-default">
+            <span>...</span>
+            <input id="upload_input_2" type="file" name="fichiers"/>
+        </div>
+    </div>
+    <div class="blocUpload">
+        <input class="upload_texte" id="input_up_3" placeholder="Choisir un fichier" disabled="disabled" />
+        <div class="fileUpload btn btn-default">
+            <span>...</span>
+            <input id="upload_input_3" type="file" name="fichiers"/>
+        </div>
+    </div>
+
+    <br />
+    <input type="submit" class="btn btn-success" name="Submit" id="Submit" value="Envoyer" />
 }
