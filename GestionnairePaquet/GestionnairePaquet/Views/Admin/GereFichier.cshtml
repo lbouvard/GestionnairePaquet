@@ -31,6 +31,15 @@
                         <label for="nomDossier">Nom du dossier</label>
                         <input type="text" class="form-control" id="nomDossier" name="nomDossier">
                     </div>
+
+                    @{ var typeDossier = System.Web.HttpContext.Current.Session["typeDossierEnCours"]; }
+                    @if( typeDossier.Equals("Produit") )
+                    {
+                        <div class="form-group">
+                            <label for="changelogVersion">ChangeLog de la version</label>
+                            <input type="text" class="form-control" id="changelogVersion" name="changelogVersion">
+                        </div>
+                    }
                 </div>
 
                 <div class="modal-footer">

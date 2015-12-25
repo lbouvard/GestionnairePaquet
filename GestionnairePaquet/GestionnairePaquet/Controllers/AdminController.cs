@@ -38,9 +38,35 @@ namespace GestionnairePaquet.Controllers
                 System.Web.HttpContext.Current.Session["historiqueNavigation"] = null;
             }
 
+            //on recupère les infos du dossier en cours
             var dossierEnCours = (from d in db.Dossiers where d.ID == id select d).FirstOrDefault();
             HistoriseNavigation(new Navigation { Id = dossierEnCours.ID, Nom = dossierEnCours.Nom });
 
+            //on regarde si le dossier courrent est un produit, dans ce cas on ajoute un dossier version et on affiche la saisie du changelog
+            if( dossierEnCours.TypeDossier == TypeDossier.Produit)
+            {
+                var produit = (from p in db.Produits where p.Nom == dossierEnCours.Nom select p.ID).FirstOrDefault();
+
+                if( produit != 0 )
+                {
+                    System.Web.HttpContext.Current.Session["produitIdEnCours"] = produit.ToString();
+                }
+            }
+
+            //si le dossier courant est une version, on mémorise en session son id
+            if( dossierEnCours.TypeDossier == TypeDossier.Version)
+            {
+                var version = (from v in db.Versions where v.Numero == dossierEnCours.Nom select v.ID).FirstOrDefault();
+
+                if (version != 0)
+                {
+                    System.Web.HttpContext.Current.Session["versionIdEnCours"] = version.ToString();
+                }
+            }
+
+            System.Web.HttpContext.Current.Session["typeDossierEnCours"] = dossierEnCours.TypeDossier.ToString();
+
+            //on mémorise l'id du dossier parent
             System.Web.HttpContext.Current.Session["niveauDossier"] = id.ToString();
              
             List<Dossier> liste = (from d in db.Dossiers
@@ -74,13 +100,13 @@ namespace GestionnairePaquet.Controllers
         public ActionResult TraiteChargement(IEnumerable<HttpPostedFileBase> fichiers)
         {
             var id_encours = System.Web.HttpContext.Current.Session["niveauDossier"].ToString();
-            Dossier dos = db.Dossiers.Find(id_encours);
+            Dossier dos = db.Dossiers.Find(int.Parse(id_encours));
 
             if( dos != null)
             {
                 if( dos.TypeDossier != TypeDossier.Version)
                 {
-                    Warning(string.Format("Vous ne pouvez pas charger les fichier sous le dossier {0}. Seule les versions peuvent contenir des fichiers.", dos.Nom), true);
+                    Warning(string.Format("Vous ne pouvez pas charger les fichier sous le dossier {0}. Seules les dossiers de version peuvent contenir des fichiers.", dos.Nom), true);
                     return RedirectToAction("GereFichier", "Admin", new { id = int.Parse(id_encours) });
                 }
             }
@@ -112,6 +138,11 @@ namespace GestionnairePaquet.Controllers
                         var nouveauFichier = new Dossier { Nom = fichier.FileName, ParentID = int.Parse(id_encours), EstCree = true, EstDossier = false };
                         db.Dossiers.Add(nouveauFichier);
                         db.SaveChanges();
+
+                        //enregistrement pour restitution au client
+                        TraiteDonneesUtilisateur(11, int.Parse(System.Web.HttpContext.Current.Session["produitIdEnCours"].ToString()),
+                                                    int.Parse(System.Web.HttpContext.Current.Session["versionIdEnCours"].ToString()), fichier.FileName, "", fichier.ContentLength);
+
                     }
                 }
             }
@@ -145,6 +176,9 @@ namespace GestionnairePaquet.Controllers
                 }
                 else if( dossierParent.TypeDossier == TypeDossier.Produit)
                 {
+                    //on enregistre une version pour le client
+                    TraiteDonneesUtilisateur(10, int.Parse(System.Web.HttpContext.Current.Session["produitIdEnCours"].ToString()), 0, Request.Form["nomDossier"].ToString(),
+                                            Request.Form["changelogVersion"] );
                     typedossier = TypeDossier.Version;
                 }
                 else if( dossierParent.TypeDossier == null)
@@ -673,6 +707,48 @@ namespace GestionnairePaquet.Controllers
                     SupprimerDossierRecursif(el.ID);
                 }
             }
+        }
+
+        private void TraiteDonneesUtilisateur(int typeOperation, int idProduit, int idVersion, string nomElement, string changeLog = "", int taille = 0)
+        {
+
+            switch (typeOperation)
+            {
+                case 10:
+                    //ajout d'une version
+                    var version = new Models.Version { ProduitID = idProduit, ChangeLog = changeLog, Numero = nomElement  };
+
+                    db.Versions.Add(version);
+
+                    break;
+                case 11:
+                    //ajout d'un fichier
+                    var decoupage = nomElement.Split('.');
+                    var nom = decoupage[0];
+                    var extension = decoupage[1];
+
+                    var fichier = new Fichier { Nom = nom, Extension = extension, VersionID = idVersion, DateVersion = DateTimeOffset.Now, Taille = taille, Icone = "ic_" + extension + ".png" };
+
+                    db.Fichiers.Add(fichier);
+
+                    break;
+                case 20:
+                    //renomme une version (+ changeLog)
+                    break;
+                case 21:
+                    //renomme un fichier
+                    break;
+                case 30:
+                    //supprime une version (et ses fichiers)
+                    break;
+                case 31:
+                    //supprime un fichier
+                    break;
+                default:
+                    break;
+            }
+
+            db.SaveChanges();
         }
 
         protected override void Dispose(bool disposing)
