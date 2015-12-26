@@ -236,11 +236,13 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Images\ic_accueil.png" />
     <Content Include="Content\Images\ic_apk.png" />
+    <Content Include="Content\Images\ic_faq.png" />
     <Content Include="Content\Images\ic_flamingsoftware.png" />
     <Content Include="Content\Images\ic_pdf.png" />
     <Content Include="Content\Images\ic_plastprodapp.png" />
     <Content Include="Content\Images\ic_txt.png" />
     <Content Include="Content\Images\ic_word.png" />
+    <Content Include="Content\Images\logo_vide.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -274,7 +276,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\APropos.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
@@ -305,6 +307,7 @@
     <Content Include="Views\Client\Version.cshtml" />
     <Content Include="Views\Client\AfficheFichiers.cshtml" />
     <Content Include="Views\Admin\GereFichier.cshtml" />
+    <Content Include="Views\Home\Faq.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

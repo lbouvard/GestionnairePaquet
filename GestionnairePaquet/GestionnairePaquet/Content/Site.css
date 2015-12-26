@@ -118,6 +118,19 @@ footer .box {
     position: relative;
 }
 
+footer .box .column:nth-child(1) {
+    left: 0;
+}
+
+footer .box .column:nth-child(2) {
+    right: 0;
+}
+
+footer .box .column {
+    display: block;
+    position: absolute;
+}
+
 footer .box .column div:first-child {
     color: #796767;
     font-weight: bold;
@@ -150,6 +163,8 @@ footer, footer a {
 
 .panel-login {
 	border-color: #000000;
+    width: 60%;
+    margin: auto;
 }
 .panel-login>.panel-heading {
 	background-color: #e48b00;
@@ -170,6 +185,7 @@ footer, footer a {
 	-webkit-transition: all 0.1s linear;
 	-moz-transition: all 0.1s linear;
 	transition: all 0.1s linear;
+    margin: auto;
 }
 
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {

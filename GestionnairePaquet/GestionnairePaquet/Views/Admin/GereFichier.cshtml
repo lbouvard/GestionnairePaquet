@@ -68,6 +68,15 @@
                         <input type="text" class="form-control" id="nomNouveauDossier" name="nomNouveauDossier" />
                         <input type="hidden" id="idDossierActuel" name="idDossierActuel" />
                     </div>
+
+                    @{ var typeDossier = System.Web.HttpContext.Current.Session["typeDossierEnCours"]; }
+                    @if (typeDossier.Equals("Produit"))
+                    {
+                        <div class="form-group">
+                            <label for="changelogVersion">ChangeLog de la version (vide pour garder la valeur)</label>
+                            <input type="text" class="form-control" id="changelogVersion" name="changelogVersion">
+                        </div>
+                    }
                 </div>
 
                 <div class="modal-footer">

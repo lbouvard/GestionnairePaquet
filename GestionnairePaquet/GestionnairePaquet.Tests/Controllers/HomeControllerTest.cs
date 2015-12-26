@@ -9,6 +9,9 @@ using GestionnairePaquet.Controllers;
 
 namespace GestionnairePaquet.Tests.Controllers
 {
+    /// <summary>
+    /// Permet de tester la page d'accueil, a propos et faq
+    /// </summary>
     [TestClass]
     public class HomeControllerTest
     {
@@ -38,5 +41,17 @@ namespace GestionnairePaquet.Tests.Controllers
             Assert.AreEqual("Your application description page.", result.ViewBag.Message);
         }
 
+        [TestMethod]
+        public void Faq()
+        {
+            // Arrange
+            HomeController controller = new HomeController();
+
+            // Act
+            ViewResult result = controller.Faq() as ViewResult;
+
+            // Assert
+            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
+        }
     }
 }

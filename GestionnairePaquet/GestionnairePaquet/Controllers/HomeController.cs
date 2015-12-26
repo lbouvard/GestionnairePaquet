@@ -13,24 +13,6 @@ namespace GestionnairePaquet.Controllers
     {
         public ActionResult Index()
         {
-            /*using (var context = new ApplicationDbContext())
-            {
-                var test = context.Produits.FirstOrDefault();
-
-                Produit produit1 = new Produit
-                {
-                    Nom = "PlastProdApp",
-                    Categorie = "Commercial",
-                    Description = "Gestion commercial mobile",
-                    Actif = true,
-                    ListeVersion = null
-                };
-
-                context.Produits.Add(produit1);
-                //applique les changements
-                context.SaveChanges();
-            }*/
-
             return View();
         }
 
@@ -38,6 +20,11 @@ namespace GestionnairePaquet.Controllers
         {
             ViewBag.Message = "A propos de nous...";
 
+            return View();
+        }
+
+        public ActionResult Faq()
+        {
             return View();
         }
 

@@ -19,6 +19,7 @@ namespace GestionnairePaquet.Models
         [Required]
         public string Adresse { get; set; }
         [Required]
+        [Display(Name = "Code postal")]
         [StringLength(5, ErrorMessage ="Veuillez entrer le code postal sur cinq caractères.", MinimumLength = 5)]
         public string CodePostal { get; set; }
         [Required]

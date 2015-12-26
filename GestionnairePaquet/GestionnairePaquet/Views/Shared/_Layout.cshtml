@@ -23,7 +23,10 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Accueil", "Index", "Home")</li>
                     <li>@Html.ActionLink("Mon compte", "Index", "Manage")</li>
-                    <li>@Html.ActionLink("Telechargement", "Index", "Client")</li>
+                    @if (!User.IsInRole("Admin"))
+                    {
+                        <li>@Html.ActionLink("Telechargement", "Index", "Client")</li>
+                    }
                     @if (User.IsInRole("Admin"))
                     {
                         <li class="dropdown">
@@ -49,9 +52,13 @@
         <footer>
             <div class="box">
                 <div class="column">
-                    <div>&copy;@DateTime.Now.Year FlamingSoftware.com</div>
+                    <div>&copy;@DateTime.Now.Year FlamingSoftware</div>
                     <div>@Html.ActionLink("A propos de nous", "APropos", "Home")</div>
-                    <div>@Html.ActionLink("Question réponse", "Faq", "Home")</div>
+                </div>
+                <div class="column">
+                    <div>Support</div>
+                    <div><a href="mailto:support@flamingsoft.fr">Service client</a></div>
+                    <div>@Html.ActionLink("Questions-réponses", "Faq", "Home")</div>
                 </div>
             </div>
         </footer>
