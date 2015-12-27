@@ -38,7 +38,7 @@ namespace GestionnairePaquet.Tests.Controllers
             ViewResult result = controller.APropos() as ViewResult;
 
             // Assert
-            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
+            Assert.AreEqual("A propos de nous...", result.ViewBag.Message);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace GestionnairePaquet.Tests.Controllers
             ViewResult result = controller.Faq() as ViewResult;
 
             // Assert
-            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
+            Assert.IsNotNull(result);
         }
     }
 }
